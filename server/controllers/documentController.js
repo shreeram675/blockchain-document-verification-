@@ -12,6 +12,25 @@ const calculateFileHash = (filePath) => {
     return '0x' + hashSum.digest('hex'); // 0x prefix for Solidity bytes32
 };
 
+// Helper to safely delete file with retries
+const safeDelete = async (filePath) => {
+    const maxRetries = 5;
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            if (fs.existsSync(filePath)) {
+                await fs.promises.unlink(filePath);
+            }
+            return;
+        } catch (err) {
+            if (err.code === 'EBUSY' && i < maxRetries - 1) {
+                await new Promise(resolve => setTimeout(resolve, 100 * (i + 1))); // Exponential backoff
+            } else {
+                console.error(`Failed to delete file ${filePath}:`, err.message);
+            }
+        }
+    }
+};
+
 exports.uploadDocument = async (req, res) => {
     if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
     const uploaderId = req.user.id; // From JWT
@@ -47,7 +66,7 @@ exports.uploadDocument = async (req, res) => {
         // Check DB first
         const [existing] = await db.query('SELECT * FROM documents WHERE original_hash = ?', [docHash]);
         if (existing.length > 0) {
-            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            await safeDelete(filePath);
             return res.status(200).json({
                 message: 'Document already exists',
                 txHash: existing[0].tx_hash,
@@ -92,12 +111,12 @@ exports.uploadDocument = async (req, res) => {
         );
 
         // Cleanup: Delete file from server (we don't store documents)
-        fs.unlinkSync(filePath);
+        await safeDelete(filePath);
 
         res.status(201).json({ message: 'Document anchored successfully', txHash, docHash, expiryDate });
     } catch (error) {
         console.error(error);
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath); // Cleanup on error
+        await safeDelete(filePath); // Cleanup on error
         res.status(500).json({ message: 'Upload/Anchor failed: ' + error.message });
     }
 };
@@ -162,6 +181,7 @@ exports.verifyDocument = async (req, res) => {
         if (result === 'valid' && dbDoc.length > 0 && dbDoc[0].status === 'active') {
             try {
                 const { generateProofObject, computeProofHash } = require('../utils/proofGenerator');
+                const certificateService = require('../services/certificateService'); // Require service
 
                 const proofObject = generateProofObject({
                     documentHash: String(docHash),
@@ -175,10 +195,36 @@ exports.verifyDocument = async (req, res) => {
 
                 const proofHash = computeProofHash(proofObject);
 
-                // Persist proof to database
+                // Persist proof to database (Legacy/Backup)
                 await db.query(
                     'INSERT INTO verification_proofs (verification_id, proof_hash, proof_object) VALUES (?, ?, ?)',
                     [verificationId, proofHash, JSON.stringify(proofObject)]
+                );
+
+                // NEW: Generate PDF immediately
+                const pdfPath = await certificateService.generatePDFCertificate({
+                    proofHash,
+                    proofObject
+                });
+
+                const qrUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-proof/${proofHash}`;
+
+                // NEW: Insert into verification_certificates table
+                await db.query(
+                    `INSERT INTO verification_certificates 
+                    (certificate_id, document_id, document_hash, tx_hash, block_number, institution_id, status, pdf_path, qr_url)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                    [
+                        proofHash,
+                        docId,
+                        docHash,
+                        dbDoc[0].tx_hash,
+                        dbDoc[0].block_number,
+                        dbDoc[0].institution_id,
+                        'VALID',
+                        pdfPath,
+                        qrUrl
+                    ]
                 );
 
                 console.log(`✅ Verification certificate generated: ${proofHash}`);
@@ -197,7 +243,7 @@ exports.verifyDocument = async (req, res) => {
         }
 
         // Cleanup uploaded file
-        fs.unlinkSync(filePath);
+        await safeDelete(filePath);
 
         // Return response with certificate data if available
         res.json({
@@ -208,7 +254,7 @@ exports.verifyDocument = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        await safeDelete(filePath);
         res.status(500).json({ message: 'Verification failed' });
     }
 };

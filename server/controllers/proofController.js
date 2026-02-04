@@ -23,8 +23,6 @@ exports.verifyProof = async (req, res) => {
             `SELECT 
                 vp.proof_object, 
                 vp.created_at,
-                vp.blockchain_tx_hash,
-                vp.blockchain_block_number,
                 v.result as verification_result
             FROM verification_proofs vp
             JOIN verifications v ON vp.verification_id = v.id
@@ -97,10 +95,10 @@ exports.verifyProof = async (req, res) => {
             },
             proof_hash: proofHash,
             certificate_issued_at: storedProof.created_at,
-            blockchain_anchor: storedProof.blockchain_tx_hash ? {
-                tx_hash: storedProof.blockchain_tx_hash,
-                block_number: storedProof.blockchain_block_number
-            } : null
+            blockchain_anchor: {
+                tx_hash: proofObject.blockchain_tx,
+                block_number: proofObject.block_number
+            }
         });
 
     } catch (error) {
