@@ -219,10 +219,9 @@ export default function ProofVerification() {
                                 </p>
                             </div>
 
-                            {/* Download Options */}
                             <div className="flex gap-3">
                                 <a
-                                    href={`http://${window.location.hostname}:5001/api/certificates/download/${proofHash}`}
+                                    href={`/api/certificates/download/${proofHash}`}
                                     className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
                                     download
                                 >
@@ -231,7 +230,7 @@ export default function ProofVerification() {
                                 </a>
 
                                 <a
-                                    href={`http://${window.location.hostname}:5001/api/certificates/json/${proofHash}`}
+                                    href={`/api/certificates/json/${proofHash}`}
                                     className="px-6 py-4 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
                                     download
                                 >

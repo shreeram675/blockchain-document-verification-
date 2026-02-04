@@ -3,7 +3,7 @@ import axios from 'axios';
 // Use current hostname (works for localhost AND local network IP)
 const hostname = window.location.hostname;
 const api = axios.create({
-    baseURL: `http://${hostname}:5001/api`,
+    baseURL: '/api',
 });
 
 // Add Token to requests
