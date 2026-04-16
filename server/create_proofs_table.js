@@ -20,6 +20,7 @@ async function createProofsTable() {
                 proof_hash VARCHAR(64) UNIQUE NOT NULL,
                 proof_object JSON NOT NULL,
                 blockchain_tx_hash VARCHAR(66) NULL,
+                blockchain_block_number BIGINT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (verification_id) REFERENCES verifications(id) ON DELETE CASCADE
             );

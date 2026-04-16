@@ -197,8 +197,16 @@ exports.verifyDocument = async (req, res) => {
 
                 // Persist proof to database (Legacy/Backup)
                 await db.query(
-                    'INSERT INTO verification_proofs (verification_id, proof_hash, proof_object) VALUES (?, ?, ?)',
-                    [verificationId, proofHash, JSON.stringify(proofObject)]
+                    `INSERT INTO verification_proofs
+                    (verification_id, proof_hash, proof_object, blockchain_tx_hash, blockchain_block_number)
+                    VALUES (?, ?, ?, ?, ?)`,
+                    [
+                        verificationId,
+                        proofHash,
+                        JSON.stringify(proofObject),
+                        dbDoc[0].tx_hash,
+                        dbDoc[0].block_number
+                    ]
                 );
 
                 // NEW: Generate PDF immediately

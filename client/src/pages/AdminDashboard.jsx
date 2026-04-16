@@ -25,6 +25,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AdminDashboard = () => {
+    const txExplorerBase = import.meta.env.VITE_BLOCK_EXPLORER_TX_BASE || '';
     const [stats, setStats] = useState({
         users: 0,
         documents: 0,
@@ -191,8 +192,8 @@ const AdminDashboard = () => {
                                         </div>
                                         <div className="text-right">
                                             <p className="text-xs text-slate-400">{new Date(doc.created_at).toLocaleDateString()}</p>
-                                            {doc.tx_hash && (
-                                                <a href={`https://etherscan.io/tx/${doc.tx_hash}`} target="_blank" rel="noreferrer"
+                                            {doc.tx_hash && txExplorerBase && (
+                                                <a href={`${txExplorerBase}${doc.tx_hash}`} target="_blank" rel="noreferrer"
                                                     className="text-xs text-indigo-600 hover:underline flex items-center gap-1 justify-end">
                                                     View TX <ExternalLink className="w-3 h-3" />
                                                 </a>
@@ -322,7 +323,7 @@ const AdminDashboard = () => {
                             </div>
                         ))}
                     </div>
-                    <span className="text-sm font-bold text-slate-700">12 Active Admins</span>
+                    <span className="text-sm font-bold text-slate-700">Admin overview</span>
                 </div>
             </header>
 
@@ -347,8 +348,8 @@ const AdminDashboard = () => {
                             <div className={`p-3 rounded-xl bg-${item.color}-50 text-${item.color}-600`}>
                                 <item.icon className="w-6 h-6" />
                             </div>
-                            <span className="text-xs font-bold text-green-500 flex items-center bg-green-50 px-2 py-1 rounded-full">
-                                <ArrowUpRight className="w-3 h-3" /> 12%
+                            <span className="text-xs font-bold text-slate-500 flex items-center bg-slate-100 px-2 py-1 rounded-full">
+                                <ArrowUpRight className="w-3 h-3" /> Live data
                             </span>
                         </div>
                         <div className="mt-4">
@@ -599,15 +600,11 @@ const AdminDashboard = () => {
                         <div className="space-y-4 relative z-10">
                             <div className="flex items-center gap-3 text-emerald-400 text-xs font-bold">
                                 <CheckCircle2 className="w-4 h-4" />
-                                BLOCKCHAIN SYNC: 100%
+                                Blockchain-backed verification enabled
                             </div>
                             <div className="flex items-center gap-3 text-emerald-400 text-xs font-bold">
                                 <CheckCircle2 className="w-4 h-4" />
-                                DB INTEGRITY: SECURE
-                            </div>
-                            <div className="flex items-center gap-3 text-emerald-400 text-xs font-bold">
-                                <CheckCircle2 className="w-4 h-4" />
-                                SSL/TLS: ACTIVE
+                                Verification events stored in MySQL
                             </div>
                         </div>
                         <button className="w-full mt-8 bg-indigo-600 text-white py-3 rounded-xl font-bold text-sm hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 group">

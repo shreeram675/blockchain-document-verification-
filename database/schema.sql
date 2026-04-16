@@ -78,6 +78,37 @@ CREATE TABLE IF NOT EXISTS verifications (
     FOREIGN KEY (verifier_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
+-- Verification Proofs Table
+CREATE TABLE IF NOT EXISTS verification_proofs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    verification_id INT NOT NULL,
+    proof_hash CHAR(64) NOT NULL UNIQUE,
+    proof_object JSON NOT NULL,
+    blockchain_tx_hash VARCHAR(66) NULL,
+    blockchain_block_number BIGINT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (verification_id) REFERENCES verifications(id) ON DELETE CASCADE,
+    INDEX idx_proof_hash (proof_hash),
+    INDEX idx_verification_id (verification_id)
+);
+
+-- Verification Certificates Table
+CREATE TABLE IF NOT EXISTS verification_certificates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    certificate_id VARCHAR(255) UNIQUE,
+    document_id INT NULL,
+    document_hash VARCHAR(255) NOT NULL,
+    tx_hash VARCHAR(255) NULL,
+    block_number BIGINT NULL,
+    institution_id INT NULL,
+    status ENUM('VALID', 'INVALID') NOT NULL,
+    issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    pdf_path VARCHAR(255) NULL,
+    qr_url VARCHAR(255) NULL,
+    FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE SET NULL,
+    FOREIGN KEY (institution_id) REFERENCES institutions(id) ON DELETE SET NULL
+);
+
 -- Audit Logs Table
 CREATE TABLE IF NOT EXISTS audit_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,

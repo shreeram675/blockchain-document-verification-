@@ -11,7 +11,7 @@ async function migrate() {
                 proof_hash CHAR(64) NOT NULL UNIQUE,
                 proof_object JSON NOT NULL,
                 blockchain_tx_hash VARCHAR(66),
-                blockchain_block_number INT,
+                blockchain_block_number BIGINT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (verification_id) REFERENCES verifications(id) ON DELETE CASCADE,
                 INDEX idx_proof_hash (proof_hash),

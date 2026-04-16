@@ -193,6 +193,7 @@ exports.deactivateInstitution = async (req, res) => {
 
 exports.reactivateInstitution = async (req, res) => {
     const { id } = req.params;
+    const adminRevocationReason = 'Institution deactivated by admin';
 
     const connection = await db.getConnection();
     try {
@@ -207,24 +208,49 @@ exports.reactivateInstitution = async (req, res) => {
         // Mark institution as active
         await connection.query('UPDATE institutions SET status = "active" WHERE id = ?', [id]);
 
-        // Restore all documents from this institution to active
-        await connection.query('UPDATE documents SET status = "active" WHERE institution_id = ?', [id]);
+        // Restore only documents revoked solely by institution deactivation.
+        const [restorableDocuments] = await connection.query(
+            `SELECT d.id
+             FROM documents d
+             WHERE d.institution_id = ?
+               AND d.status = "revoked"
+               AND EXISTS (
+                   SELECT 1
+                   FROM revoked_documents rd
+                   WHERE rd.document_id = d.id
+                     AND rd.reason = ?
+               )
+               AND NOT EXISTS (
+                   SELECT 1
+                   FROM revoked_documents rd
+                   WHERE rd.document_id = d.id
+                     AND rd.reason <> ?
+               )`,
+            [id, adminRevocationReason, adminRevocationReason]
+        );
 
-        // Remove revocation records for documents from this institution
+        if (restorableDocuments.length > 0) {
+            await connection.query(
+                'UPDATE documents SET status = "active" WHERE id IN (?)',
+                [restorableDocuments.map(doc => doc.id)]
+            );
+        }
+
+        // Remove only the revocation records created by institution deactivation.
         await connection.query(`
             DELETE FROM revoked_documents 
             WHERE document_id IN (
                 SELECT id FROM documents WHERE institution_id = ?
             )
-        `, [id]);
+            AND reason = ?
+        `, [id, adminRevocationReason]);
 
-        // Get count of restored documents
-        const [documents] = await connection.query('SELECT COUNT(*) as count FROM documents WHERE institution_id = ?', [id]);
+        const restoredCount = restorableDocuments.length;
 
         await connection.commit();
         res.json({ 
             message: 'Institution reactivated successfully',
-            documentsRestored: documents[0].count
+            documentsRestored: restoredCount
         });
     } catch (error) {
         await connection.rollback();

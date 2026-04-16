@@ -5,6 +5,7 @@ import { ShieldCheck, CheckCircle2, XCircle, Loader2, FileText, ExternalLink, Do
 import api from '../api/axios';
 
 export default function ProofVerification() {
+    const txExplorerBase = import.meta.env.VITE_BLOCK_EXPLORER_TX_BASE || '';
     const { proofHash } = useParams();
     const navigate = useNavigate();
     const [proofData, setProofData] = useState(null);
@@ -179,15 +180,21 @@ export default function ProofVerification() {
                                 <div className="space-y-3">
                                     <div className="flex justify-between items-center">
                                         <span className="text-sm text-slate-600 font-medium">Transaction Hash:</span>
-                                        <a
-                                            href={`https://etherscan.io/tx/${proofData.proof.blockchain_tx}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700 font-mono text-xs"
-                                        >
-                                            {proofData.proof.blockchain_tx.substring(0, 10)}...
-                                            <ExternalLink className="w-3 h-3" />
-                                        </a>
+                                        {txExplorerBase ? (
+                                            <a
+                                                href={`${txExplorerBase}${proofData.proof.blockchain_tx}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center gap-1 text-indigo-600 hover:text-indigo-700 font-mono text-xs"
+                                            >
+                                                {proofData.proof.blockchain_tx.substring(0, 10)}...
+                                                <ExternalLink className="w-3 h-3" />
+                                            </a>
+                                        ) : (
+                                            <span className="font-mono text-xs text-slate-700">
+                                                {proofData.proof.blockchain_tx.substring(0, 18)}...
+                                            </span>
+                                        )}
                                     </div>
 
                                     <div className="flex justify-between items-center">

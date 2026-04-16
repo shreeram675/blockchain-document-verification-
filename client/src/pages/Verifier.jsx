@@ -13,6 +13,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Verifier = () => {
+    const txExplorerBase = import.meta.env.VITE_BLOCK_EXPLORER_TX_BASE || '';
     const [file, setFile] = useState(null);
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -55,7 +56,7 @@ const Verifier = () => {
                         Instant Verification
                     </h1>
                     <p className="text-slate-500 mt-2 font-medium">
-                        Validate document authenticity against the public ledger
+                        Validate document authenticity against the configured blockchain ledger
                     </p>
                 </div>
 
@@ -156,9 +157,11 @@ const Verifier = () => {
                                             ) : (
                                                 <>
                                                     <p className="font-mono text-[10px] text-indigo-600 truncate mr-4">{result.txHash}</p>
-                                                    <a href={`https://etherscan.io/tx/${result.txHash}`} target="_blank" rel="noreferrer" className="p-2 hover:bg-indigo-50 rounded-xl transition-colors">
-                                                        <ExternalLink className="w-4 h-4 text-indigo-600" />
-                                                    </a>
+                                                    {txExplorerBase && (
+                                                        <a href={`${txExplorerBase}${result.txHash}`} target="_blank" rel="noreferrer" className="p-2 hover:bg-indigo-50 rounded-xl transition-colors">
+                                                            <ExternalLink className="w-4 h-4 text-indigo-600" />
+                                                        </a>
+                                                    )}
                                                 </>
                                             )}
                                         </div>
@@ -192,7 +195,7 @@ const Verifier = () => {
                                                 {/* Download Options */}
                                                 <div className="grid grid-cols-2 gap-3">
                                                     <a
-                                                        href={`http://${window.location.hostname}:5001${result.certificate.downloadPDF}`}
+                                                        href={result.certificate.downloadPDF}
                                                         className="flex items-center justify-center gap-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all transform hover:scale-105"
                                                         download
                                                     >
@@ -201,7 +204,7 @@ const Verifier = () => {
                                                     </a>
 
                                                     <a
-                                                        href={`http://${window.location.hostname}:5001${result.certificate.downloadJSON}`}
+                                                        href={result.certificate.downloadJSON}
                                                         className="flex items-center justify-center gap-2 px-4 py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all transform hover:scale-105"
                                                         download
                                                     >

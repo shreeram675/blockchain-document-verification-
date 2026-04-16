@@ -37,7 +37,7 @@ app.get('/health', (req, res) => {
     res.json({ status: 'ok' });
 });
 
-const PORT = 5001;
+const PORT = Number(process.env.PORT) || 5000;
 
 process.on('uncaughtException', (err) => {
     console.error('UNCAUGHT EXCEPTION:', err);

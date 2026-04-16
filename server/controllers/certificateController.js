@@ -1,7 +1,5 @@
 const db = require('../config/db');
 const certificateService = require('../services/certificateService');
-const path = require('path');
-const fs = require('fs');
 
 /**
  * Download PDF certificate
@@ -101,11 +99,13 @@ exports.getCertificatePreview = async (req, res) => {
         const { proofHash } = req.params;
 
         const [proofs] = await db.query(
-            `SELECT 
+            `SELECT
                 vp.proof_object,
                 vp.created_at,
-                vp.blockchain_tx_hash
+                vc.tx_hash,
+                vc.block_number
             FROM verification_proofs vp
+            LEFT JOIN verification_certificates vc ON vc.certificate_id = vp.proof_hash
             WHERE vp.proof_hash = ?`,
             [proofHash]
         );
@@ -122,8 +122,8 @@ exports.getCertificatePreview = async (req, res) => {
             proof_hash: proofHash,
             institution: proofObject.institution_name,
             verified_at: proofObject.verified_at,
-            blockchain_tx: proofObject.blockchain_tx,
-            block_number: proofObject.block_number,
+            blockchain_tx: proofs[0].tx_hash || proofObject.blockchain_tx,
+            block_number: proofs[0].block_number || proofObject.block_number,
             certificate_issued_at: proofs[0].created_at,
             download_urls: {
                 pdf: `/api/certificates/download/${proofHash}`,
