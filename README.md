@@ -21,22 +21,41 @@ A full-stack decentralized platform to verify document authenticity using **SHA-
 > Add your images here (very important)
 
 ### Upload Dashboard
-![Upload](./screenshots/upload.png)
+![upload](./screenshots/testing_dashboard.jpeg)
 
 ### Admin Dashboard
-![Admin](./screenshots/admin.png)
+![Admin](./screenshots/admin_analysis_dashboard.jpeg)
 
 ### Verification Result
-![Verification](./screenshots/verification.png)
+![Verification](./screenshots/verification_result.jpeg)
 
+![Verification](./screenshots/tampered_document.jpeg)
+
+![Verification](./screenshots/verification_cirtificate.jpeg)
 ---
 
+## 🌐 Live Demo
+Coming soon (local deployment supported)
 ## 🧠 What Problem Does It Solve?
+
+## 💡 Key Engineering Decisions
+
+- Used **SHA-256 hashing instead of storing files on-chain** to reduce gas cost
+- Combined **blockchain + MySQL** for scalability and performance
+- Designed **institution approval workflow** to simulate real-world systems
+- Implemented **deterministic proof generation** for tamper-evident certificates
 
 Traditional document verification systems suffer from:
 - forged certificates
 - centralized and mutable records
 - lack of transparency for third-party verification
+
+## ⭐ Why This Project Stands Out
+
+- Not just a CRUD app — includes blockchain integration
+- Covers full system design (frontend + backend + DB + smart contracts)
+- Implements real-world workflows (institution approval, revocation)
+- Includes proof generation and certificate validation
 
 This system solves it using:
 - **cryptographic hashing → ensures integrity**
