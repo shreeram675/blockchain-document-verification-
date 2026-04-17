@@ -21,10 +21,8 @@ A full-stack decentralized platform to verify document authenticity using **SHA-
 > Add your images here (very important)
 
 ### Upload Dashboard
-![Upload](./screenshots/upload.png)
-
 ### Admin Dashboard
-![Admin](./screenshots/admin.png)
+![Admin](./screenshots/admin_analysis_dashboard.jpeg)
 
 ### Verification Result
 ![Verification](./screenshots/verification.png)
