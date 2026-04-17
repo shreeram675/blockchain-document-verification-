@@ -6,7 +6,7 @@ require('dotenv').config();
 // Load Contract ABI
 // Assuming the artifact is at ../blockchain/artifacts/contracts/DocumentRegistry.sol/DocumentRegistry.json
 // Since we are in /server/utils, we go ../../blockchain/...
-const ARTIFACT_PATH = path.join(__dirname, '../../blockchain/artifacts/contracts/DocumentRegistry.sol/DocumentRegistry.json');
+const ARTIFACT_PATH = path.join(__dirname, "../abi/DocumentRegistry.json");
 
 let web3;
 let contract;
