@@ -1,5 +1,4 @@
-CREATE DATABASE IF NOT EXISTS doc_verify_db;
-USE doc_verify_db;
+-- ❌ REMOVE CREATE DATABASE / USE (handled by backend)
 
 -- Institutions Table
 CREATE TABLE IF NOT EXISTS institutions (
@@ -22,7 +21,7 @@ CREATE TABLE IF NOT EXISTS users (
     FOREIGN KEY (institution_id) REFERENCES institutions(id) ON DELETE SET NULL
 );
 
--- Institution Requests Table (New)
+-- Institution Requests
 CREATE TABLE IF NOT EXISTS institution_requests (
     id INT AUTO_INCREMENT PRIMARY KEY,
     uploader_id INT NOT NULL,
@@ -37,13 +36,13 @@ CREATE TABLE IF NOT EXISTS institution_requests (
     FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- Documents Table
+-- Documents
 CREATE TABLE IF NOT EXISTS documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
     uploader_id INT NOT NULL,
     institution_id INT NOT NULL,
     filename VARCHAR(255) NOT NULL,
-    original_hash CHAR(66) NOT NULL, -- SHA-256 usually 64 chars, 66 for 0x prefix
+    original_hash CHAR(66) NOT NULL,
     tx_hash CHAR(66) NULL,
     block_number BIGINT NULL,
     status ENUM('active', 'revoked') DEFAULT 'active',
@@ -53,7 +52,7 @@ CREATE TABLE IF NOT EXISTS documents (
     FOREIGN KEY (institution_id) REFERENCES institutions(id)
 );
 
--- Revoked Documents Table
+-- Revoked Documents
 CREATE TABLE IF NOT EXISTS revoked_documents (
     id INT AUTO_INCREMENT PRIMARY KEY,
     document_id INT NOT NULL,
@@ -64,10 +63,10 @@ CREATE TABLE IF NOT EXISTS revoked_documents (
     FOREIGN KEY (revoked_by) REFERENCES users(id)
 );
 
--- Verifications Table
+-- Verifications
 CREATE TABLE IF NOT EXISTS verifications (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    doc_id INT NULL, -- Can be null if verifying an external file not in DB? No, usually checking against DB.
+    doc_id INT NULL,
     verifier_id INT NULL,
     uploaded_hash CHAR(66) NOT NULL,
     stored_hash CHAR(66) NULL,
@@ -78,7 +77,7 @@ CREATE TABLE IF NOT EXISTS verifications (
     FOREIGN KEY (verifier_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- Verification Proofs Table
+-- Verification Proofs
 CREATE TABLE IF NOT EXISTS verification_proofs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     verification_id INT NOT NULL,
@@ -87,12 +86,10 @@ CREATE TABLE IF NOT EXISTS verification_proofs (
     blockchain_tx_hash VARCHAR(66) NULL,
     blockchain_block_number BIGINT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (verification_id) REFERENCES verifications(id) ON DELETE CASCADE,
-    INDEX idx_proof_hash (proof_hash),
-    INDEX idx_verification_id (verification_id)
+    FOREIGN KEY (verification_id) REFERENCES verifications(id) ON DELETE CASCADE
 );
 
--- Verification Certificates Table
+-- Verification Certificates
 CREATE TABLE IF NOT EXISTS verification_certificates (
     id INT AUTO_INCREMENT PRIMARY KEY,
     certificate_id VARCHAR(255) UNIQUE,
@@ -109,7 +106,7 @@ CREATE TABLE IF NOT EXISTS verification_certificates (
     FOREIGN KEY (institution_id) REFERENCES institutions(id) ON DELETE SET NULL
 );
 
--- Audit Logs Table
+-- Audit Logs
 CREATE TABLE IF NOT EXISTS audit_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     action VARCHAR(255) NOT NULL,
