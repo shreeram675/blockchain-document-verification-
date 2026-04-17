@@ -6,7 +6,9 @@ require("dotenv").config();
 
 const fs = require("fs");
 const path = require("path");
-const mysql = require("mysql2/promise");
+
+// ✅ IMPORTANT: use SAME db everywhere
+const db = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes");
 const institutionRoutes = require("./routes/institutionRoutes");
@@ -16,19 +18,7 @@ const certificateRoutes = require("./routes/certificateRoutes");
 
 const app = express();
 
-// ✅ DB Connection (Railway Public)
-const db = mysql.createPool({
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
-
-// ✅ Initialize DB + Seed
+// ✅ Initialize DB + Seed (uses SAME db)
 const initDB = async () => {
   try {
     console.log("🔄 Initializing database...");
@@ -36,7 +26,7 @@ const initDB = async () => {
     const schemaPath = path.join(__dirname, "../database/schema.sql");
     let schema = fs.readFileSync(schemaPath, "utf8");
 
-    // ❌ Remove unwanted lines
+    // remove unwanted lines
     schema = schema.replace(/CREATE DATABASE.*;/gi, "");
     schema = schema.replace(/USE .*;/gi, "");
 
@@ -55,16 +45,16 @@ const initDB = async () => {
 
     console.log("✅ Tables ensured");
 
-    // ✅ Safe Admin Seed
+    // ✅ Seed admin
     await db.query(`
-            INSERT INTO users (name, email, password_hash, role)
-            SELECT 'System Admin', 'admin@example.com',
-            '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW',
-            'admin'
-            WHERE NOT EXISTS (
-                SELECT 1 FROM users WHERE email = 'admin@example.com'
-            );
-        `);
+      INSERT INTO users (name, email, password_hash, role)
+      SELECT 'System Admin', 'admin@example.com',
+      '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW',
+      'admin'
+      WHERE NOT EXISTS (
+        SELECT 1 FROM users WHERE email = 'admin@example.com'
+      );
+    `);
 
     console.log("✅ Admin user ready");
   } catch (err) {
@@ -86,12 +76,12 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/certificates", certificateRoutes);
 
-// Health Check
+// Health
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-// Global Error Handler
+// Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res
@@ -101,7 +91,7 @@ app.use((err, req, res, next) => {
 
 const PORT = Number(process.env.PORT) || 5000;
 
-// Start server after DB init
+// 🚀 Start AFTER DB init
 const startServer = async () => {
   await initDB();
 
