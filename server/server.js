@@ -7,7 +7,7 @@ require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
 
-// ✅ IMPORTANT: use SAME db everywhere
+// ✅ Use SAME db everywhere
 const db = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes");
@@ -18,15 +18,31 @@ const certificateRoutes = require("./routes/certificateRoutes");
 
 const app = express();
 
-// ✅ Initialize DB + Seed (uses SAME db)
+// ✅ Resolve schema path safely (works on Render + local)
+const resolveSchemaPath = () => {
+  const candidates = [
+    path.join(__dirname, "database", "schema.sql"), // if database/ is beside server.js
+    path.join(__dirname, "..", "database", "schema.sql"), // if server.js is inside /server
+  ];
+
+  for (const p of candidates) {
+    if (fs.existsSync(p)) {
+      console.log("📄 Using schema at:", p);
+      return p;
+    }
+  }
+  throw new Error("schema.sql not found in expected locations");
+};
+
+// ✅ Initialize DB + Seed
 const initDB = async () => {
   try {
     console.log("🔄 Initializing database...");
 
-    const schemaPath = path.join(__dirname, "../database/schema.sql");
+    const schemaPath = resolveSchemaPath();
     let schema = fs.readFileSync(schemaPath, "utf8");
 
-    // remove unwanted lines
+    // Remove DB-specific lines (Railway already has DB)
     schema = schema.replace(/CREATE DATABASE.*;/gi, "");
     schema = schema.replace(/USE .*;/gi, "");
 
@@ -45,7 +61,7 @@ const initDB = async () => {
 
     console.log("✅ Tables ensured");
 
-    // ✅ Seed admin
+    // ✅ Seed admin safely
     await db.query(`
       INSERT INTO users (name, email, password_hash, role)
       SELECT 'System Admin', 'admin@example.com',
@@ -83,10 +99,11 @@ app.get("/health", (req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res
-    .status(500)
-    .json({ message: "Internal Server Error", error: err.message });
+  console.error("❌ Unhandled Error:", err.stack);
+  res.status(500).json({
+    message: "Internal Server Error",
+    error: err.message,
+  });
 });
 
 const PORT = Number(process.env.PORT) || 5000;
