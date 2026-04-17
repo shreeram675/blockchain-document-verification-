@@ -1,4 +1,55 @@
-# Blockchain-Based Document Verification System
+# 🔐 Blockchain-Based Document Verification System
+
+A full-stack decentralized platform to verify document authenticity using **SHA-256 hashing + Ethereum blockchain anchoring**, ensuring tamper-proof validation and transparent verification.
+
+---
+
+## 🚀 Key Highlights
+
+- ⛓️ Blockchain-backed document verification (Ethereum + Hardhat + Ganache)
+- 🔐 SHA-256 hashing for tamper-proof integrity
+- 👥 Role-based system (Admin / Uploader / Verifier)
+- 🏛️ Institution approval workflow (real-world simulation)
+- 📄 QR-based certificate & proof generation (PDF + JSON)
+- 📊 Admin analytics dashboard
+- ⚡ End-to-end system across frontend, backend, DB, and blockchain
+
+---
+
+## 📸 Screenshots
+
+> Add your images here (very important)
+
+### Upload Dashboard
+![Upload](./screenshots/upload.png)
+
+### Admin Dashboard
+![Admin](./screenshots/admin.png)
+
+### Verification Result
+![Verification](./screenshots/verification.png)
+
+---
+
+## 🧠 What Problem Does It Solve?
+
+Traditional document verification systems suffer from:
+- forged certificates
+- centralized and mutable records
+- lack of transparency for third-party verification
+
+This system solves it using:
+- **cryptographic hashing → ensures integrity**
+- **blockchain anchoring → ensures immutability**
+- **verification certificates → ensures trust**
+
+---
+
+## 🏗️ Architecture Overview
+
+Frontend (React) → Backend (Node.js) → MySQL  
+                             ↓  
+                     Ethereum Blockchain
 
 ## Overview
 This project is a full-stack document verification platform that combines:
