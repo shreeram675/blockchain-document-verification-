@@ -106,18 +106,20 @@ const initDB = async () => {
 
     console.log("✅ Core tables created");
 
-    // ✅ Admin seed
-    const bcrypt = require("bcryptjs");
+   const bcrypt = require("bcryptjs");
 
-    // 🔥 TEMP: remove old admin (important)
-    await db.query(`DELETE FROM users WHERE email = 'admin@example.com'`);
+   // 🔥 Always reset admin (temporary)
+   await db.query(`DELETE FROM users WHERE email = 'admin@example.com'`);
 
-    const hashedPassword = await bcrypt.hash("admin123", 10);
+   const hashedPassword = await bcrypt.hash("admin123", 10);
 
-    await db.query(`
+   await db.query(
+     `
   INSERT INTO users (name, email, password_hash, role)
-  VALUES ('System Admin', 'admin@example.com', '${hashedPassword}', 'admin')
-`);
+  VALUES ('System Admin', 'admin@example.com', ?, 'admin')
+`,
+     [hashedPassword],
+   );
 
     console.log("✅ Admin user ready");
   } catch (err) {
