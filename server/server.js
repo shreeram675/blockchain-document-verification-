@@ -62,6 +62,19 @@ const initDB = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+    await db.query(`
+  CREATE TABLE IF NOT EXISTS institution_requests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    uploader_id INT NOT NULL,
+    institution_name VARCHAR(255) NOT NULL,
+    institution_address TEXT NOT NULL,
+    status ENUM('pending','approved','rejected') DEFAULT 'pending',
+    reviewed_by INT NULL,
+    reviewed_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    rejection_reason TEXT NULL
+  )
+`);
 
     await db.query(`
       CREATE TABLE IF NOT EXISTS documents (
