@@ -37,31 +37,63 @@ const resolveSchemaPath = () => {
 // ✅ Initialize DB + Seed
 const initDB = async () => {
   try {
-    console.log("🔄 Initializing database...");
+    console.log("🔄 Initializing database (direct SQL)...");
 
-    const schemaPath = resolveSchemaPath();
-    let schema = fs.readFileSync(schemaPath, "utf8");
+    // 🟢 Create tables directly (NO FILE NEEDED)
 
-    // Remove DB-specific lines (Railway already has DB)
-    schema = schema.replace(/CREATE DATABASE.*;/gi, "");
-    schema = schema.replace(/USE .*;/gi, "");
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS institutions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        address TEXT NOT NULL,
+        status ENUM('active','inactive') DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
-    const queries = schema
-      .split(";")
-      .map((q) => q.trim())
-      .filter((q) => q.length);
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        role ENUM('admin','uploader','verifier') NOT NULL,
+        institution_id INT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
-    for (const query of queries) {
-      try {
-        await db.query(query);
-      } catch (err) {
-        console.log("⚠️ Skipped:", err.message);
-      }
-    }
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS documents (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        uploader_id INT NOT NULL,
+        institution_id INT NOT NULL,
+        filename VARCHAR(255) NOT NULL,
+        original_hash CHAR(66) NOT NULL,
+        tx_hash CHAR(66),
+        block_number BIGINT,
+        status ENUM('active','revoked') DEFAULT 'active',
+        expiry_date DATE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
-    console.log("✅ Tables ensured");
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS verifications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        doc_id INT,
+        verifier_id INT,
+        uploaded_hash CHAR(66) NOT NULL,
+        stored_hash CHAR(66),
+        result ENUM('valid','invalid') NOT NULL,
+        verifier_ip VARCHAR(45),
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
-    // ✅ Seed admin safely
+    console.log("✅ Core tables created");
+
+    // ✅ Admin seed
     await db.query(`
       INSERT INTO users (name, email, password_hash, role)
       SELECT 'System Admin', 'admin@example.com',
