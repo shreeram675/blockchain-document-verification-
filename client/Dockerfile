@@ -1,22 +1,28 @@
-# Build stage
-FROM node:20 as build
+FROM node:20
 
+# Root
 WORKDIR /app
 
-COPY package*.json ./
-
-RUN npm install
-
+# Copy everything first
 COPY . .
 
+# 🔥 Go to frontend
+WORKDIR /app/client
+
+# DEBUG (temporary)
+RUN ls -la
+RUN cat package.json
+RUN npm run
+
+# Install + build frontend
+RUN npm install
 RUN npm run build
 
-# Production stage
-FROM nginx:alpine
+# 🔥 Go back to backend
+WORKDIR /app
 
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Install backend deps
+RUN npm install
 
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+# Start server
+CMD ["node", "server.js"]
