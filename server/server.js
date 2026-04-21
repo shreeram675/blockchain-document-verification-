@@ -91,7 +91,6 @@ const initDB = async () => {
 
     console.log("✅ Tables ready");
 
-    // Admin seed (safe)
     const bcrypt = require("bcryptjs");
 
     await db.query(`DELETE FROM users WHERE email = 'admin@example.com'`);
@@ -120,7 +119,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /* =========================
-   API ROUTES (FIRST!)
+   API ROUTES
 ========================= */
 app.use("/api/auth", authRoutes);
 app.use("/api/institutions", institutionRoutes);
@@ -138,16 +137,12 @@ app.get("/health", (req, res) => {
 /* =========================
    FRONTEND SERVING
 ========================= */
-
-// IMPORTANT: this must match Docker build output
 const frontendPath = path.join(__dirname, "..", "client", "dist");
 
-// Serve static files
 app.use(express.static(frontendPath));
 
-// SPA fallback (React Router support)
-app.get("*", (req, res, next) => {
-  // Skip API routes
+// ✅ FIXED: NO MORE app.get("*")
+app.use((req, res, next) => {
   if (req.originalUrl.startsWith("/api")) {
     return next();
   }
