@@ -1,18 +1,24 @@
-import axios from 'axios';
+import axios from "axios";
 
-// Use current hostname (works for localhost AND local network IP)
-const hostname = window.location.hostname;
+// ✅ Use relative base URL (works in both dev & production)
 const api = axios.create({
-    baseURL: 'https://blockchain-document-verification-46on.onrender.com/api',
+  baseURL: "/api",
 });
 
-// Add Token to requests
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
+// ✅ Attach JWT token automatically
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+
     if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
-});
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
 
 export default api;

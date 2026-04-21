@@ -6,9 +6,10 @@ require("dotenv").config();
 
 const path = require("path");
 
-// ✅ Use SAME db everywhere
+// DB
 const db = require("./config/db");
 
+// Routes
 const authRoutes = require("./routes/authRoutes");
 const institutionRoutes = require("./routes/institutionRoutes");
 const adminRoutes = require("./routes/adminRoutes");
@@ -17,10 +18,12 @@ const certificateRoutes = require("./routes/certificateRoutes");
 
 const app = express();
 
-// ✅ Initialize DB + Seed
+/* =========================
+   DATABASE INIT
+========================= */
 const initDB = async () => {
   try {
-    console.log("🔄 Initializing database (direct SQL)...");
+    console.log("🔄 Initializing database...");
 
     await db.query(`
       CREATE TABLE IF NOT EXISTS institutions (
@@ -86,9 +89,9 @@ const initDB = async () => {
       )
     `);
 
-    console.log("✅ Core tables created");
+    console.log("✅ Tables ready");
 
-    // ✅ Admin reset (dev purpose)
+    // Admin seed (safe)
     const bcrypt = require("bcryptjs");
 
     await db.query(`DELETE FROM users WHERE email = 'admin@example.com'`);
@@ -96,10 +99,8 @@ const initDB = async () => {
     const hashedPassword = await bcrypt.hash("admin123", 10);
 
     await db.query(
-      `
-      INSERT INTO users (name, email, password_hash, role)
-      VALUES ('System Admin', 'admin@example.com', ?, 'admin')
-    `,
+      `INSERT INTO users (name, email, password_hash, role)
+       VALUES ('System Admin', 'admin@example.com', ?, 'admin')`,
       [hashedPassword],
     );
 
@@ -109,36 +110,54 @@ const initDB = async () => {
   }
 };
 
-// Middleware
+/* =========================
+   MIDDLEWARE
+========================= */
 app.use(cors());
 app.use(helmet());
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// API Routes
+/* =========================
+   API ROUTES (FIRST!)
+========================= */
 app.use("/api/auth", authRoutes);
 app.use("/api/institutions", institutionRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/certificates", certificateRoutes);
 
-// Health check
+/* =========================
+   HEALTH CHECK
+========================= */
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-// ✅ Serve Vite frontend (correct path)
+/* =========================
+   FRONTEND SERVING
+========================= */
+
+// IMPORTANT: this must match Docker build output
 const frontendPath = path.join(__dirname, "client", "dist");
 
+// Serve static files
 app.use(express.static(frontendPath));
 
-// ✅ SAFE fallback (no wildcard → no crash)
-app.use((req, res) => {
+// SPA fallback (React Router support)
+app.get("*", (req, res, next) => {
+  // Skip API routes
+  if (req.originalUrl.startsWith("/api")) {
+    return next();
+  }
+
   res.sendFile(path.join(frontendPath, "index.html"));
 });
 
-// Error handler
+/* =========================
+   ERROR HANDLER
+========================= */
 app.use((err, req, res, next) => {
   console.error("❌ Unhandled Error:", err.stack);
   res.status(500).json({
@@ -147,9 +166,11 @@ app.use((err, req, res, next) => {
   });
 });
 
+/* =========================
+   START SERVER
+========================= */
 const PORT = Number(process.env.PORT) || 5000;
 
-// Start server
 const startServer = async () => {
   await initDB();
 
