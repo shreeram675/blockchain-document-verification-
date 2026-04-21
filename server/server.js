@@ -18,28 +18,10 @@ const certificateRoutes = require("./routes/certificateRoutes");
 
 const app = express();
 
-// ✅ Resolve schema path safely (works on Render + local)
-const resolveSchemaPath = () => {
-  const candidates = [
-    path.join(__dirname, "database", "schema.sql"), // if database/ is beside server.js
-    path.join(__dirname, "..", "database", "schema.sql"), // if server.js is inside /server
-  ];
-
-  for (const p of candidates) {
-    if (fs.existsSync(p)) {
-      console.log("📄 Using schema at:", p);
-      return p;
-    }
-  }
-  throw new Error("schema.sql not found in expected locations");
-};
-
 // ✅ Initialize DB + Seed
 const initDB = async () => {
   try {
     console.log("🔄 Initializing database (direct SQL)...");
-
-    // 🟢 Create tables directly (NO FILE NEEDED)
 
     await db.query(`
       CREATE TABLE IF NOT EXISTS institutions (
@@ -62,19 +44,20 @@ const initDB = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
     await db.query(`
-  CREATE TABLE IF NOT EXISTS institution_requests (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    uploader_id INT NOT NULL,
-    institution_name VARCHAR(255) NOT NULL,
-    institution_address TEXT NOT NULL,
-    status ENUM('pending','approved','rejected') DEFAULT 'pending',
-    reviewed_by INT NULL,
-    reviewed_at TIMESTAMP NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    rejection_reason TEXT NULL
-  )
-`);
+      CREATE TABLE IF NOT EXISTS institution_requests (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        uploader_id INT NOT NULL,
+        institution_name VARCHAR(255) NOT NULL,
+        institution_address TEXT NOT NULL,
+        status ENUM('pending','approved','rejected') DEFAULT 'pending',
+        reviewed_by INT NULL,
+        reviewed_at TIMESTAMP NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        rejection_reason TEXT NULL
+      )
+    `);
 
     await db.query(`
       CREATE TABLE IF NOT EXISTS documents (
@@ -106,20 +89,20 @@ const initDB = async () => {
 
     console.log("✅ Core tables created");
 
-   const bcrypt = require("bcryptjs");
+    // ✅ Admin reset (for development)
+    const bcrypt = require("bcryptjs");
 
-   // 🔥 Always reset admin (temporary)
-   await db.query(`DELETE FROM users WHERE email = 'admin@example.com'`);
+    await db.query(`DELETE FROM users WHERE email = 'admin@example.com'`);
 
-   const hashedPassword = await bcrypt.hash("admin123", 10);
+    const hashedPassword = await bcrypt.hash("admin123", 10);
 
-   await db.query(
-     `
-  INSERT INTO users (name, email, password_hash, role)
-  VALUES ('System Admin', 'admin@example.com', ?, 'admin')
-`,
-     [hashedPassword],
-   );
+    await db.query(
+      `
+      INSERT INTO users (name, email, password_hash, role)
+      VALUES ('System Admin', 'admin@example.com', ?, 'admin')
+    `,
+      [hashedPassword],
+    );
 
     console.log("✅ Admin user ready");
   } catch (err) {
@@ -144,6 +127,15 @@ app.use("/api/certificates", certificateRoutes);
 // Health
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
+});
+
+// ✅ Serve Vite frontend (CORRECT PATH)
+const frontendPath = path.join(__dirname, "client", "dist");
+
+app.use(express.static(frontendPath));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
 });
 
 // Error handler
