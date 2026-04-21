@@ -140,7 +140,7 @@ app.get("/health", (req, res) => {
 ========================= */
 
 // IMPORTANT: this must match Docker build output
-const frontendPath = path.join(__dirname, "client", "dist");
+const frontendPath = path.join(__dirname, "..", "client", "dist");
 
 // Serve static files
 app.use(express.static(frontendPath));

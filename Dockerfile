@@ -1,5 +1,7 @@
+# Use Node.js
 FROM node:20
 
+# Root
 WORKDIR /app
 
 # Copy everything
@@ -10,9 +12,12 @@ WORKDIR /app/client
 RUN npm install
 RUN npm run build
 
-# 🔥 Install backend deps
-WORKDIR /app
+# 🔥 Install backend dependencies
+WORKDIR /app/server
 RUN npm install
 
-# Start server
+# Expose port
+EXPOSE 5000
+
+# Start backend
 CMD ["node", "server.js"]
