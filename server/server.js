@@ -4,7 +4,6 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 require("dotenv").config();
 
-const fs = require("fs");
 const path = require("path");
 
 // ✅ Use SAME db everywhere
@@ -89,7 +88,7 @@ const initDB = async () => {
 
     console.log("✅ Core tables created");
 
-    // ✅ Admin reset (for development)
+    // ✅ Admin reset (dev purpose)
     const bcrypt = require("bcryptjs");
 
     await db.query(`DELETE FROM users WHERE email = 'admin@example.com'`);
@@ -106,7 +105,7 @@ const initDB = async () => {
 
     console.log("✅ Admin user ready");
   } catch (err) {
-    console.error("❌ DB Init Error:", err.message);
+    console.error("❌ DB Init Error:", err);
   }
 };
 
@@ -117,24 +116,25 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
+// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/institutions", institutionRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/certificates", certificateRoutes);
 
-// Health
+// Health check
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-// ✅ Serve Vite frontend (CORRECT PATH)
+// ✅ Serve Vite frontend (correct path)
 const frontendPath = path.join(__dirname, "client", "dist");
 
 app.use(express.static(frontendPath));
 
-app.get("*", (req, res) => {
+// ✅ SAFE fallback (no wildcard → no crash)
+app.use((req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
 
@@ -149,7 +149,7 @@ app.use((err, req, res, next) => {
 
 const PORT = Number(process.env.PORT) || 5000;
 
-// 🚀 Start AFTER DB init
+// Start server
 const startServer = async () => {
   await initDB();
 
