@@ -17,7 +17,7 @@ const documentRoutes = require("./routes/documentRoutes");
 const certificateRoutes = require("./routes/certificateRoutes");
 
 const app = express();
-
+app.use(express.static("public"));
 /* =========================
    DATABASE INIT
 ========================= */
