@@ -92,17 +92,20 @@ class CertificateService {
           .text("Certificate Details", { underline: true });
 
         doc.moveDown(0.5);
-        doc.fontSize(11).font("Helvetica");
-
-
+        doc
+          .fontSize(11)
+          .font("Helvetica")
           .text("Issuing Institution: ", { continued: true })
           .font("Helvetica")
-.text(safeProof.institution_name);
+          .text(safeProof.institution_name);
 
         doc.moveDown(0.3);
 
         // Document Hash (shortened for readability)
-const shortHash = safeProof.document_hash !== 'N/A' ? `${safeProof.document_hash.substring(0, 16)}...${safeProof.document_hash.substring(48)}` : safeProof.document_hash;
+        const shortHash =
+          safeProof.document_hash !== "N/A"
+            ? `${safeProof.document_hash.substring(0, 16)}...${safeProof.document_hash.substring(48)}`
+            : safeProof.document_hash;
         doc
           .font("Helvetica-Bold")
           .text("Document Hash: ", { continued: true })
@@ -117,7 +120,7 @@ const shortHash = safeProof.document_hash !== 'N/A' ? `${safeProof.document_hash
           .text("Verification Status: ", { continued: true })
           .font("Helvetica")
           .fillColor("#2e7d32")
-.text(safeProof.verification_result);
+          .text(safeProof.verification_result);
 
         doc.fillColor("#000");
         doc.moveDown(0.3);

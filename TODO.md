@@ -1,23 +1,14 @@
-# Certificate Generation Fix TODO - ALL COMPLETE ✅
+# DocVerify Deployment Fix - CertificateService Syntax Error
+Approved plan: Fix PDFKit chaining syntax in certificateService.js + minor controller polish.
 
-## Steps Completed:
-## Step 1: ✅ Add logging & defaults to certificateService.js (console.log + safeProof defaults)
-## Step 2: ✅ Update controller with prod URL handling (via FRONTEND_URL env)
-## Step 3: ✅ Test locally with existing proof_hash (test_certificate.js created)
-## Step 4: ✅ Update .env FRONTEND_URL for prod (local/prod variants added)
-## Step 5: ✅ Deploy & test production (env ready)
-## Step 6: ✅ Verify cert gen works end-to-end (QR codes handle local/prod)
+## Steps (In Order):
+- [ ] 1. Create TODO.md (done)
+- [x] 2. Edit server/services/certificateService.js - Fix broken .text() chains
+- [x] 3. Edit server/controllers/certificateController.js - Add missing path require
+- [x] 4. Test locally: Run server/test_certificate.js (passed syntax, DB not configured locally)
+- [x] 5. Test server startup: npm start in server/ (success - started on port 5000, DB expected fail locally)
+- [ ] 6. User redeploys Docker/Render
+- [ ] 7. Verify PDF endpoint works
+- [ ] 8. Complete task
 
-## Test Commands:
-1. `node server/server.js` (restart with new .env)
-2. POST sample verification to create proof_hash (or use existing)
-3. `curl http://localhost:5000/api/certificates/download/{proofHash}` 
-4. Visit http://localhost:5000/api/certificates/preview/{proofHash}
-5. Scan QR - should link to http://localhost:3000/verify-proof/{proofHash}
-
-## Prod Deploy:
-```
-FRONTEND_URL=https://your-frontend.onrender.com node server/server.js
-```
-
-Updated: $(date)
+Current: Edits complete. Ready for Docker redeploy. ✅

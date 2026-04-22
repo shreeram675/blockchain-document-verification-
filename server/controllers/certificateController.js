@@ -1,5 +1,6 @@
-const db = require('../config/db');
-const certificateService = require('../services/certificateService');
+const path = require("path");
+const db = require("../config/db");
+const certificateService = require("../services/certificateService");
 
 /**
  * Download PDF certificate
