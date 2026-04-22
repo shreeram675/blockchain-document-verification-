@@ -3,10 +3,8 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 require("dotenv").config();
-
 const path = require("path");
-const helmet = require("helmet");
-app.use(helmet());
+
 // DB
 const db = require("./config/db");
 
@@ -17,8 +15,9 @@ const adminRoutes = require("./routes/adminRoutes");
 const documentRoutes = require("./routes/documentRoutes");
 const certificateRoutes = require("./routes/certificateRoutes");
 
+// ✅ CREATE APP FIRST
 const app = express();
-app.use(express.static("public"));
+
 /* =========================
    DATABASE INIT
 ========================= */
@@ -114,10 +113,15 @@ const initDB = async () => {
    MIDDLEWARE
 ========================= */
 app.use(cors());
-app.use(helmet());
+app.use(helmet()); // ✅ ONLY ONCE HERE
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+/* =========================
+   STATIC FILES (optional public)
+========================= */
+app.use(express.static("public"));
 
 /* =========================
    API ROUTES
@@ -142,12 +146,10 @@ const frontendPath = path.join(__dirname, "..", "client", "dist");
 
 app.use(express.static(frontendPath));
 
-// ✅ FIXED: NO MORE app.get("*")
 app.use((req, res, next) => {
   if (req.originalUrl.startsWith("/api")) {
     return next();
   }
-
   res.sendFile(path.join(frontendPath, "index.html"));
 });
 
@@ -158,13 +160,16 @@ app.use((err, req, res, next) => {
   console.error("❌ Unhandled Error:", err.stack);
   res.status(500).json({
     message: "Internal Server Error",
-    error: err.message,
   });
 });
 
+/* =========================
+   404 HANDLER
+========================= */
 app.use((req, res) => {
   res.status(404).json({ message: "Not Found" });
 });
+
 /* =========================
    START SERVER
 ========================= */
