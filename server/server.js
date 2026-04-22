@@ -5,7 +5,7 @@ const morgan = require("morgan");
 require("dotenv").config();
 
 const path = require("path");
-import helmet from "helmet";
+const helmet = require("helmet");
 app.use(helmet());
 // DB
 const db = require("./config/db");
@@ -161,6 +161,7 @@ app.use((err, req, res, next) => {
     error: err.message,
   });
 });
+
 app.use((req, res) => {
   res.status(404).json({ message: "Not Found" });
 });
