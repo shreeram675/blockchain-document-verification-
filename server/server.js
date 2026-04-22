@@ -5,7 +5,8 @@ const morgan = require("morgan");
 require("dotenv").config();
 
 const path = require("path");
-
+import helmet from "helmet";
+app.use(helmet());
 // DB
 const db = require("./config/db");
 
