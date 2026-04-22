@@ -1,5 +1,9 @@
 const db = require("../config/db");
 const blockchain = require("../utils/blockchain");
+const {
+  generateProofObject,
+  computeProofHash,
+} = require("../utils/proofGenerator");
 const crypto = require("crypto");
 const fs = require("fs");
 
@@ -135,6 +139,36 @@ exports.verifyDocument = async (req, res) => {
         details = {
           institution: dbDoc[0].institution_name,
           txHash: dbDoc[0].tx_hash,
+        };
+
+        // Generate cryptographic proof for PDF certificate
+        const now = new Date().toISOString();
+        const proofObject = generateProofObject({
+          documentHash: docHash,
+          institutionName: dbDoc[0].institution_name,
+          verifiedAt: now,
+          blockchainTx: dbDoc[0].tx_hash,
+          blockNumber: bcResult.blockNumber || dbDoc[0].block_number || 0,
+          verifierType: "public",
+          expiryDate: dbDoc[0].expiry_date,
+        });
+        const proofHash = computeProofHash(proofObject);
+
+        // Store proof for certificate download
+        await db.query(
+          "INSERT INTO verification_proofs (proof_hash, proof_object) VALUES (?, ?)",
+          [proofHash, JSON.stringify(proofObject)],
+        );
+        console.log(
+          `✅ Proof generated: ${proofHash.substring(0, 16)}... for doc ${docHash.substring(0, 16)}...`,
+        );
+
+        // Add certificate download info to response
+        details.certificate = {
+          proofHash,
+          downloadPDF: `/api/certificates/download/${proofHash}`,
+          downloadJSON: `/api/certificates/json/${proofHash}`,
+          verifyOnline: `/verify-proof/${proofHash}`,
         };
       }
     }
