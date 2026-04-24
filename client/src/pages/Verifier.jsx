@@ -31,12 +31,11 @@ const Verifier = () => {
         formData.append('document', file);
 
         try {
-            const res = await api.post('/documents/verify', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
+            const res = await api.post('/documents/verify', formData);
             setResult(res.data);
         } catch (err) {
-            setError('Verification failed or server error');
+            const msg = err.response?.data?.message || err.message || 'Verification failed or server error';
+            setError(msg);
         }
         setLoading(false);
     };
@@ -99,6 +98,15 @@ const Verifier = () => {
                             </>
                         )}
                     </button>
+                    {error && (
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="text-red-600 text-center font-bold bg-red-50 p-4 rounded-2xl"
+                        >
+                            {error}
+                        </motion.p>
+                    )}
                 </form>
 
                 <AnimatePresence>
@@ -245,18 +253,6 @@ const Verifier = () => {
                         </motion.div>
                     )}
                 </AnimatePresence>
-
-                {
-                    error && (
-                        <motion.p
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="mt-6 text-red-600 text-center font-bold bg-red-50 p-4 rounded-2xl"
-                        >
-                            {error}
-                        </motion.p>
-                    )
-                }
 
                 <div className="mt-12 pt-8 border-t border-slate-100 text-center">
                     <p className="text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase mb-4">Secured by decentralized protocol</p>
