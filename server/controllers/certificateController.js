@@ -8,8 +8,8 @@ const certificateService = require("../services/certificateService");
  * Public access - anyone with proof hash can download
  */
 exports.downloadPDF = async (req, res) => {
+  const { proofHash } = req.params;
   try {
-    const { proofHash } = req.params;
     const baseUrl =
       process.env.FRONTEND_URL ||
       "https://blockchain-document-verification-46on.onrender.com";

@@ -238,10 +238,11 @@ export default function ProofVerification() {
 
                                 <a
                                     href={`/api/certificates/json/${proofHash}`}
-                                    className="px-6 py-4 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
+                                    className="flex items-center justify-center gap-2 px-6 py-4 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
                                     download
                                 >
                                     <Download className="w-5 h-5" />
+                                    Download JSON
                                 </a>
                             </div>
                         </div>

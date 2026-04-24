@@ -136,9 +136,14 @@ exports.verifyDocument = async (req, res) => {
     if (bcResult.exists && dbDoc.length > 0) {
       if (bcResult.status === "0" && dbDoc[0].status === "active") {
         result = "valid";
+        const expiryDate = dbDoc[0].expiry_date || null;
+        const isExpired = expiryDate ? new Date() > new Date(expiryDate) : false;
         details = {
           institution: dbDoc[0].institution_name,
           txHash: dbDoc[0].tx_hash,
+          timestamp: dbDoc[0].created_at,
+          expiryDate,
+          isExpired,
         };
 
         // Generate cryptographic proof for PDF certificate
@@ -154,10 +159,29 @@ exports.verifyDocument = async (req, res) => {
         });
         const proofHash = computeProofHash(proofObject);
 
+        // Log verification record first (required FK for verification_proofs)
+        const [verificationInsert] = await db.query(
+          `INSERT INTO verifications (doc_id, verifier_id, uploaded_hash, stored_hash, result, verifier_ip)
+           VALUES (?, NULL, ?, ?, 'valid', ?)`,
+          [
+            dbDoc[0].id,
+            docHash,
+            docHash,
+            req.ip || null,
+          ],
+        );
+        const verificationId = verificationInsert.insertId;
+
         // Store proof for certificate download
         await db.query(
-          "INSERT INTO verification_proofs (proof_hash, proof_object) VALUES (?, ?)",
-          [proofHash, JSON.stringify(proofObject)],
+          "INSERT INTO verification_proofs (verification_id, proof_hash, proof_object, blockchain_tx_hash, blockchain_block_number) VALUES (?, ?, ?, ?, ?)",
+          [
+            verificationId,
+            proofHash,
+            JSON.stringify(proofObject),
+            dbDoc[0].tx_hash || null,
+            bcResult.blockNumber || dbDoc[0].block_number || null,
+          ],
         );
         console.log(
           `✅ Proof generated: ${proofHash.substring(0, 16)}... for doc ${docHash.substring(0, 16)}...`,

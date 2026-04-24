@@ -1,14 +1,14 @@
-# DocVerify Deployment Fix - CertificateService Syntax Error
-Approved plan: Fix PDFKit chaining syntax in certificateService.js + minor controller polish.
+# DocVerify: Add Proof PDF Download After Successful Verification
+✅ Dependencies read: proofGenerator perfect, cert routes complete (/verify exists), proofController ready.
 
 ## Steps (In Order):
-- [ ] 1. Create TODO.md (done)
-- [x] 2. Edit server/services/certificateService.js - Fix broken .text() chains
-- [x] 3. Edit server/controllers/certificateController.js - Add missing path require
-- [x] 4. Test locally: Run server/test_certificate.js (passed syntax, DB not configured locally)
-- [x] 5. Test server startup: npm start in server/ (success - started on port 5000, DB expected fail locally)
-- [ ] 6. User redeploys Docker/Render
-- [ ] 7. Verify PDF endpoint works
-- [ ] 8. Complete task
+- [x] 1. Create TODO.md (done)
+- [x] 2. Read dependent files (done)
+- [x] 3. Edit server/controllers/documentController.js: Add proof generation/storage/response (✅ COMPLETE - imports + logic + certificate response)
+- [x] 4. certRoutes already perfect (no edit)
+- [ ] 5. Test: docker-compose up, verify doc → DB proof created, client shows download, PDF works
+- [ ] 6. Update TODO.md
+- [ ] 7. attempt_completion
 
-Current: Edits complete. Ready for Docker redeploy. ✅
+Next: Testing ✅
+
