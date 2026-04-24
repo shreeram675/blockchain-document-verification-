@@ -19,8 +19,7 @@ const Verifier = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const handleVerify = async (e) => {
-        e.preventDefault();
+    const handleVerify = async () => {
         if (!file) return;
 
         setLoading(true);
@@ -59,7 +58,7 @@ const Verifier = () => {
                     </p>
                 </div>
 
-                <form onSubmit={handleVerify} className="space-y-8">
+                <div className="space-y-8">
                     <div className="group relative border-2 border-dashed border-slate-200 p-12 text-center rounded-3xl cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/50 transition-all">
                         <input
                             type="file"
@@ -82,9 +81,10 @@ const Verifier = () => {
                     </div>
 
                     <button
-                        type="submit"
+                        type="button"
+                        onClick={handleVerify}
                         disabled={loading || !file}
-                        className="w-full bg-slate-900 text-white py-5 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:bg-black hover:-translate-y-1 transition-all disabled:grayscale disabled:opacity-50 disabled:translate-y-0 text-lg flex items-center justify-center gap-3"
+                        className="w-full bg-slate-900 text-white py-5 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:bg-black hover:-translate-y-1 transition-all disabled:grayscale disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0 text-lg flex items-center justify-center gap-3"
                     >
                         {loading ? (
                             <>
@@ -107,7 +107,7 @@ const Verifier = () => {
                             {error}
                         </motion.p>
                     )}
-                </form>
+                </div>
 
                 <AnimatePresence>
                     {result && (
