@@ -36,6 +36,25 @@ A full-stack decentralized platform to verify document authenticity using **SHA-
 
 ## 🌐 Live Demo
 Coming soon (local deployment supported)
+
+---
+
+## ⚙️ CI/CD (GitHub Actions)
+
+Workflows live in `.github/workflows/`:
+
+- `ci.yml`: client lint/build + server syntax check (push + PR)
+- `integration.yml`: builds client, starts server, checks `GET /health` (push + PR)
+- `codeql.yml`: CodeQL static analysis (push + PR + schedule)
+- `dependency-review.yml`: dependency diff review on PRs
+- `trivy.yml`: vulnerability scan (SARIF uploaded to the repo Security tab)
+- `gitleaks.yml`: secret scanning (fails if secrets are committed)
+- `cd.yml`: builds and pushes Docker image to GHCR on default branch
+
+Environment files:
+
+- Use `.env.example` and `server/.env.example` as templates for local `.env` files.
+- Store CI secrets in GitHub repo settings (never commit real secrets).
 ## 🧠 What Problem Does It Solve?
 
 ## 💡 Key Engineering Decisions
