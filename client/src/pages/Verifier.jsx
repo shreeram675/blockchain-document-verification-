@@ -31,6 +31,17 @@ const Verifier = () => {
 
         try {
             const res = await api.post('/documents/verify', formData);
+            if (!res.data || typeof res.data !== 'object') {
+                const contentType = res.headers?.['content-type'] || 'unknown';
+                setError(
+                    `API returned an empty/non-JSON response (content-type: ${contentType}). ` +
+                    `If you're using a Render Static Site for the frontend, set VITE_API_BASE_URL ` +
+                    `to your backend URL (e.g. https://<backend>.onrender.com/api) and redeploy.`
+                );
+                setResult(null);
+                return;
+            }
+
             setResult(res.data);
         } catch (err) {
             const msg = err.response?.data?.message || err.message || 'Verification failed or server error';
