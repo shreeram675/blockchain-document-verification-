@@ -116,6 +116,13 @@ exports.verifyDocument = async (req, res) => {
   if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
   const filePath = req.file.path;
+  const forwardedProto =
+    (req.headers["x-forwarded-proto"] || "").toString().split(",")[0].trim();
+  const proto = forwardedProto || req.protocol || "https";
+  const host = req.get("host");
+  const apiBaseUrl = host ? `${proto}://${host}` : "";
+  const frontendBaseUrl =
+    process.env.FRONTEND_URL || req.headers.origin || apiBaseUrl;
 
   try {
     const docHash = calculateFileHash(filePath);
@@ -190,9 +197,9 @@ exports.verifyDocument = async (req, res) => {
         // Add certificate download info to response
         details.certificate = {
           proofHash,
-          downloadPDF: `/api/certificates/download/${proofHash}`,
-          downloadJSON: `/api/certificates/json/${proofHash}`,
-          verifyOnline: `/verify-proof/${proofHash}`,
+          downloadPDF: `${apiBaseUrl}/api/certificates/download/${proofHash}`,
+          downloadJSON: `${apiBaseUrl}/api/certificates/json/${proofHash}`,
+          verifyOnline: `${frontendBaseUrl}/verify-proof/${proofHash}`,
         };
       }
     }

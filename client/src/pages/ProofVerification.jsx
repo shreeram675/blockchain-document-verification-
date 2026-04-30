@@ -6,6 +6,7 @@ import api from '../api/axios';
 
 export default function ProofVerification() {
     const txExplorerBase = import.meta.env.VITE_BLOCK_EXPLORER_TX_BASE || '';
+    const apiBase = import.meta.env.VITE_API_BASE_URL || '/api';
     const { proofHash } = useParams();
     const navigate = useNavigate();
     const [proofData, setProofData] = useState(null);
@@ -228,7 +229,7 @@ export default function ProofVerification() {
 
                             <div className="flex gap-3">
                                 <a
-                                    href={`/api/certificates/download/${proofHash}`}
+                                    href={`${apiBase}/certificates/download/${proofHash}`}
                                     className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
                                     download
                                 >
@@ -237,7 +238,7 @@ export default function ProofVerification() {
                                 </a>
 
                                 <a
-                                    href={`/api/certificates/json/${proofHash}`}
+                                    href={`${apiBase}/certificates/json/${proofHash}`}
                                     className="flex items-center justify-center gap-2 px-6 py-4 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
                                     download
                                 >
