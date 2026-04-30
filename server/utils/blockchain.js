@@ -16,7 +16,10 @@ const initBlockchain = async () => {
     if (contract) return { web3, contract, account };
 
     try {
-        const rpcUrl = process.env.BLOCKCHAIN_RPC_URL || 'http://127.0.0.1:7545';
+        const rpcUrl = process.env.BLOCKCHAIN_RPC_URL;
+        if (!rpcUrl) {
+            throw new Error('BLOCKCHAIN_RPC_URL is not set');
+        }
         console.log('Web3 Version:', Web3.version);
         console.log('Connecting to RPC:', rpcUrl);
         web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));

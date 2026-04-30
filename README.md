@@ -53,8 +53,7 @@ Workflows live in `.github/workflows/`:
 
 Environment files:
 
-- Use `.env.example` and `server/.env.example` as templates for local `.env` files.
-- Store CI secrets in GitHub repo settings (never commit real secrets).
+- Configure environment variables in your hosting provider (Render) and GitHub repo settings (never commit real secrets).
 ## 🧠 What Problem Does It Solve?
 
 ## 💡 Key Engineering Decisions

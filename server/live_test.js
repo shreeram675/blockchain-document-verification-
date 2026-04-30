@@ -70,7 +70,12 @@ async function liveTest() {
         );
 
         console.log(`--- SUCCESS ---`);
-        console.log(`Visit: http://localhost:5173/verify-proof/${proofHash}`);
+        const baseUrl =
+            process.env.FRONTEND_URL ||
+            (process.env.RENDER_EXTERNAL_HOSTNAME
+                ? `https://${process.env.RENDER_EXTERNAL_HOSTNAME}`
+                : '');
+        console.log(`Visit: ${baseUrl ? `${baseUrl}/verify-proof/${proofHash}` : `/verify-proof/${proofHash}`}`);
 
         // 4. Test re-compute immediately in script
         const recomputed = computeProofHash(proofObject);
