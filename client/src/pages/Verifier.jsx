@@ -10,7 +10,7 @@ import {
     FileText,
     ExternalLink
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const Verifier = () => {
     const txExplorerBase = import.meta.env.VITE_BLOCK_EXPLORER_TX_BASE || '';
@@ -41,7 +41,7 @@ const Verifier = () => {
 
     return (
         <div className="min-h-screen p-4 md:p-8 flex items-center justify-center animate-fade-in">
-            <motion.div
+            <Motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="glass p-8 md:p-12 rounded-[2.5rem] shadow-2xl max-w-2xl w-full border-t-8 border-indigo-600"
@@ -99,19 +99,19 @@ const Verifier = () => {
                         )}
                     </button>
                     {error && (
-                        <motion.p
+                        <Motion.p
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             className="text-red-600 text-center font-bold bg-red-50 p-4 rounded-2xl"
                         >
                             {error}
-                        </motion.p>
+                        </Motion.p>
                     )}
                 </div>
 
                 <AnimatePresence>
                     {result && (
-                        <motion.div
+                        <Motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             className={`mt-10 overflow-hidden rounded-[2rem] border-2 ${(result.result === 'valid' && !result.isExpired)
@@ -250,7 +250,7 @@ const Verifier = () => {
                                     </p>
                                 </div>
                             )}
-                        </motion.div>
+                        </Motion.div>
                     )}
                 </AnimatePresence>
 
@@ -262,7 +262,7 @@ const Verifier = () => {
                         <History className="w-6 h-6" />
                     </div>
                 </div>
-            </motion.div >
+            </Motion.div >
         </div >
     );
 };

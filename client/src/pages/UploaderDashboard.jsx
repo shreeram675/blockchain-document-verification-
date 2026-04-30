@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { useAuth } from '../context/AuthContext';
 import {
     LayoutDashboard,
     Upload,
@@ -19,11 +18,10 @@ import {
     PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
     BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from 'recharts';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const UploaderDashboard = () => {
     const txExplorerBase = import.meta.env.VITE_BLOCK_EXPLORER_TX_BASE || '';
-    const { user } = useAuth();
     const [stats, setStats] = useState({
         totalDocuments: 0,
         verifications: [],
@@ -81,7 +79,7 @@ const UploaderDashboard = () => {
             });
             fetchStatus();
             setMessage('Request submitted successfully!');
-        } catch (err) {
+        } catch {
             setMessage('Request failed');
         }
     };
@@ -112,7 +110,6 @@ const UploaderDashboard = () => {
 
     const totalVerifications = stats.verifications.reduce((sum, v) => sum + v.count, 0);
     const validCount = stats.verifications.find(v => v.result === 'valid')?.count || 0;
-    const invalidCount = stats.verifications.find(v => v.result === 'invalid')?.count || 0;
 
     // Modal content renderer
     const renderModalContent = () => {
@@ -230,10 +227,6 @@ const UploaderDashboard = () => {
     };
 
     const COLORS = ['#10b981', '#ef4444'];
-    const verificationData = stats.verifications.map(v => ({
-        name: v.result === 'valid' ? 'Valid' : 'Invalid',
-        value: v.count
-    }));
 
     return (
         <div className="min-h-screen p-4 md:p-8 space-y-8 animate-fade-in">
@@ -260,7 +253,7 @@ const UploaderDashboard = () => {
             {/* Stats Cards - Now Clickable */}
             {instStatus === 'approved' && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         onClick={() => setModalView('documents')}
@@ -277,9 +270,9 @@ const UploaderDashboard = () => {
                             <p className="text-slate-500 text-sm font-medium">Total Documents</p>
                         </div>
                         <p className="text-xs text-indigo-600 mt-2 font-semibold">Click to view all →</p>
-                    </motion.div>
+                    </Motion.div>
 
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
@@ -297,9 +290,9 @@ const UploaderDashboard = () => {
                             <p className="text-slate-500 text-sm font-medium">Total Verifications</p>
                         </div>
                         <p className="text-xs text-purple-600 mt-2 font-semibold">Click to view all →</p>
-                    </motion.div>
+                    </Motion.div>
 
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
@@ -319,21 +312,21 @@ const UploaderDashboard = () => {
                             <p className="text-slate-500 text-sm font-medium">Verification Success</p>
                         </div>
                         <p className="text-xs text-green-600 mt-2 font-semibold">Click to view valid →</p>
-                    </motion.div>
+                    </Motion.div>
                 </div>
             )}
 
             {/* Modal */}
             <AnimatePresence>
                 {modalView && (
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
                         onClick={() => setModalView(null)}
                     >
-                        <motion.div
+                        <Motion.div
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
@@ -379,8 +372,8 @@ const UploaderDashboard = () => {
                                     {renderModalContent()}
                                 </div>
                             </div>
-                        </motion.div>
-                    </motion.div>
+                        </Motion.div>
+                    </Motion.div>
                 )}
             </AnimatePresence>
 
@@ -467,7 +460,7 @@ const UploaderDashboard = () => {
                             <div className="flex items-center gap-3">
                                 <AnimatePresence>
                                     {hasExpiry && (
-                                        <motion.input
+                                        <Motion.input
                                             initial={{ width: 0, opacity: 0 }}
                                             animate={{ width: '150px', opacity: 1 }}
                                             exit={{ width: 0, opacity: 0 }}
@@ -512,7 +505,7 @@ const UploaderDashboard = () => {
 
                     <AnimatePresence>
                         {message && (
-                            <motion.div
+                            <Motion.div
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 10 }}
@@ -532,7 +525,7 @@ const UploaderDashboard = () => {
                                         message
                                     )}
                                 </div>
-                            </motion.div>
+                            </Motion.div>
                         )}
                     </AnimatePresence>
                 </div>

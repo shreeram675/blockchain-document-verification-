@@ -22,7 +22,7 @@ import {
     PieChart, Pie, Cell, ResponsiveContainer, Tooltip as ReTooltip, Legend,
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip
 } from 'recharts';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const AdminDashboard = () => {
     const txExplorerBase = import.meta.env.VITE_BLOCK_EXPLORER_TX_BASE || '';
@@ -43,10 +43,6 @@ const AdminDashboard = () => {
     const [modalView, setModalView] = useState(null); // 'users', 'documents', 'institutions', 'verifications'
     const [searchTerm, setSearchTerm] = useState('');
 
-    useEffect(() => {
-        fetchData();
-    }, []);
-
     const fetchData = async () => {
         try {
             const s = await api.get('/admin/stats');
@@ -57,6 +53,10 @@ const AdminDashboard = () => {
             console.error(err);
         }
     };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     const handleApprove = async (id) => {
         try {
@@ -77,7 +77,7 @@ const AdminDashboard = () => {
             setMsg('Request Rejected');
             fetchData();
             setTimeout(() => setMsg(''), 3000);
-        } catch (err) {
+        } catch {
             setMsg('Failed to reject');
         }
     };
@@ -127,7 +127,6 @@ const AdminDashboard = () => {
     // Modal content renderer
     const renderModalContent = () => {
         let data = [];
-        let title = '';
 
         switch (modalView) {
             case 'users':
@@ -135,7 +134,6 @@ const AdminDashboard = () => {
                     u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     u.email?.toLowerCase().includes(searchTerm.toLowerCase())
                 );
-                title = 'All Users';
                 return (
                     <div className="space-y-2">
                         {data.length === 0 ? (
@@ -170,7 +168,6 @@ const AdminDashboard = () => {
                 data = (stats.documentsList || []).filter(d =>
                     d.filename?.toLowerCase().includes(searchTerm.toLowerCase())
                 );
-                title = 'All Documents';
                 return (
                     <div className="space-y-2">
                         {data.length === 0 ? (
@@ -210,7 +207,6 @@ const AdminDashboard = () => {
                 data = (stats.institutionsList || []).filter(i =>
                     i.name?.toLowerCase().includes(searchTerm.toLowerCase())
                 );
-                title = 'All Institutions';
                 return (
                     <div className="space-y-2">
                         {data.length === 0 ? (
@@ -267,7 +263,6 @@ const AdminDashboard = () => {
                 data = (stats.verificationsList || []).filter(v =>
                     v.filename?.toLowerCase().includes(searchTerm.toLowerCase())
                 );
-                title = 'All Verifications';
                 return (
                     <div className="space-y-2">
                         {data.length === 0 ? (
@@ -335,7 +330,7 @@ const AdminDashboard = () => {
                     { label: 'Institutions', value: stats.institutions, icon: Building2, color: 'purple', view: 'institutions' },
                     { label: 'Verifications', value: stats.verifications, icon: ShieldCheck, color: 'orange', view: 'verifications' }
                 ].map((item, idx) => (
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.1 }}
@@ -357,21 +352,21 @@ const AdminDashboard = () => {
                             <p className="text-slate-500 text-sm font-medium">{item.label}</p>
                         </div>
                         <p className="text-xs text-indigo-600 mt-2 font-semibold">Click to view details →</p>
-                    </motion.div>
+                    </Motion.div>
                 ))}
             </div>
 
             {/* Modal */}
             <AnimatePresence>
                 {modalView && (
-                    <motion.div
+                    <Motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
                         onClick={() => setModalView(null)}
                     >
-                        <motion.div
+                        <Motion.div
                             initial={{ scale: 0.9, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.9, y: 20 }}
@@ -419,8 +414,8 @@ const AdminDashboard = () => {
                                     {renderModalContent()}
                                 </div>
                             </div>
-                        </motion.div>
-                    </motion.div>
+                        </Motion.div>
+                    </Motion.div>
                 )}
             </AnimatePresence>
 
@@ -472,14 +467,14 @@ const AdminDashboard = () => {
 
                         <AnimatePresence mode="popLayout">
                             {msg && (
-                                <motion.div
+                                <Motion.div
                                     initial={{ opacity: 0, height: 0 }}
                                     animate={{ opacity: 1, height: 'auto' }}
                                     exit={{ opacity: 0, height: 0 }}
                                     className="mb-4 p-4 bg-emerald-50 text-emerald-700 rounded-2xl text-sm font-bold border border-emerald-100 flex items-center gap-2"
                                 >
                                     <CheckCircle2 className="w-4 h-4" /> {msg}
-                                </motion.div>
+                                </Motion.div>
                             )}
                         </AnimatePresence>
 
@@ -503,7 +498,7 @@ const AdminDashboard = () => {
                                         </thead>
                                         <tbody className="divide-y divide-slate-50">
                                             {requests.map(req => (
-                                                <motion.tr
+                                                <Motion.tr
                                                     layout
                                                     key={req.id}
                                                     className="group hover:bg-slate-50/50 transition-colors"
@@ -538,7 +533,7 @@ const AdminDashboard = () => {
                                                             <X className="w-5 h-5" />
                                                         </button>
                                                     </td>
-                                                </motion.tr>
+                                                </Motion.tr>
                                             ))}
                                         </tbody>
                                     </table>

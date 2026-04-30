@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { ShieldCheck, CheckCircle2, XCircle, Loader2, FileText, ExternalLink, Download, AlertTriangle } from 'lucide-react';
 import api from '../api/axios';
 
@@ -35,14 +35,14 @@ export default function ProofVerification() {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="flex flex-col items-center gap-4"
                 >
                     <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
                     <p className="text-slate-600 font-medium">Verifying cryptographic proof...</p>
-                </motion.div>
+                </Motion.div>
             </div>
         );
     }
@@ -51,7 +51,7 @@ export default function ProofVerification() {
         <div className="min-h-screen p-4 md:p-8 bg-gradient-to-br from-slate-50 to-blue-50">
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center mb-8"
@@ -65,10 +65,10 @@ export default function ProofVerification() {
                     <p className="text-slate-500">
                         Independent validation of verification certificate
                     </p>
-                </motion.div>
+                </Motion.div>
 
                 {/* Main Content */}
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="glass rounded-[2.5rem] shadow-2xl overflow-hidden"
@@ -265,10 +265,10 @@ export default function ProofVerification() {
                             </button>
                         </div>
                     )}
-                </motion.div>
+                </Motion.div>
 
                 {/* Footer Info */}
-                <motion.div
+                <Motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.3 }}
@@ -277,7 +277,7 @@ export default function ProofVerification() {
                     <p className="text-xs text-slate-500">
                         This is a zero-trust verification system. No login required.
                     </p>
-                </motion.div>
+                </Motion.div>
             </div>
         </div>
     );

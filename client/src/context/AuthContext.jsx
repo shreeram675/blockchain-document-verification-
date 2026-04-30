@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useContext } from 'react';
+import { createContext, useState, useContext } from 'react';
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
@@ -6,31 +6,30 @@ import api from '../api/axios';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(() => {
+        const token = localStorage.getItem('token');
+        if (!token) return null;
+
+        try {
+            const decoded = jwtDecode(token);
+            if (decoded.exp * 1000 < Date.now()) {
+                localStorage.removeItem('token');
+                return null;
+            }
+            return decoded;
+        } catch {
+            localStorage.removeItem('token');
+            return null;
+        }
+    });
+    const [loading] = useState(false);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            try {
-                const decoded = jwtDecode(token);
-                // Check expiry
-                if (decoded.exp * 1000 < Date.now()) {
-                    logout();
-                } else {
-                    // If we want detailed user info (like institution_id updates), 
-                    // we might need to fetch from /auth/me or store more in token.
-                    // For now, rely on decoded token + initial login response.
-                    // Better: Verify token with backend? Or just trust it.
-                    setUser(decoded);
-                }
-            } catch (e) {
-                logout();
-            }
-        }
-        setLoading(false);
-    }, []);
+    const logout = () => {
+        localStorage.removeItem('token');
+        setUser(null);
+        navigate('/login');
+    };
 
     const login = async (email, password) => {
         try {
@@ -65,12 +64,6 @@ export const AuthProvider = ({ children }) => {
         } catch (err) {
             return { success: false, message: err.response?.data?.message || 'Signup failed' };
         }
-    };
-
-    const logout = () => {
-        localStorage.removeItem('token');
-        setUser(null);
-        navigate('/login');
     };
 
     return (
