@@ -10,9 +10,13 @@ const certificateService = require("../services/certificateService");
 exports.downloadPDF = async (req, res) => {
   const { proofHash } = req.params;
   try {
+    const forwardedProto =
+      (req.headers["x-forwarded-proto"] || "").toString().split(",")[0].trim();
+    const proto = forwardedProto || req.protocol || "https";
+    const host = req.get("host");
+
     const baseUrl =
-      process.env.FRONTEND_URL ||
-      "https://blockchain-document-verification-46on.onrender.com";
+      process.env.FRONTEND_URL || (host ? `${proto}://${host}` : undefined);
 
     console.log(
       `📄 Certificate request for proofHash: ${proofHash.substring(0, 16)}... | BaseURL: ${baseUrl}`,
@@ -38,6 +42,7 @@ exports.downloadPDF = async (req, res) => {
     const filepath = await certificateService.generatePDFCertificate({
       proofHash,
       proofObject,
+      baseUrl,
     });
 
     console.log(`✅ PDF generated: ${path.basename(filepath)}`);

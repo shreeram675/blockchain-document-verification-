@@ -202,9 +202,18 @@ class CertificateService {
         doc.moveDown(2);
 
         // QR Code for verification
-const baseUrl = process.env.FRONTEND_URL || "https://blockchain-document-verification-46on.onrender.com";
-const qrUrl = `${baseUrl}/verify-proof/${proofHash}`;
-console.log('QR URL:', qrUrl);
+        const baseUrl =
+          proofData.baseUrl ||
+          process.env.FRONTEND_URL ||
+          (process.env.RENDER_EXTERNAL_HOSTNAME
+            ? `https://${process.env.RENDER_EXTERNAL_HOSTNAME}`
+            : "");
+
+        const qrUrl = baseUrl
+          ? `${baseUrl}/verify-proof/${proofHash}`
+          : `/verify-proof/${proofHash}`;
+
+        console.log("QR URL:", qrUrl);
         const qrImage = await QRCode.toDataURL(qrUrl, {
           errorCorrectionLevel: "H",
           width: 200,
