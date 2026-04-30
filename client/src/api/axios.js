@@ -1,8 +1,10 @@
 import axios from "axios";
 
 // ✅ Use relative base URL (works in both dev & production)
+const baseURL = import.meta.env.VITE_API_BASE_URL || "/api";
+
 const api = axios.create({
-  baseURL: "/api",
+  baseURL,
 });
 
 // ✅ Attach JWT token automatically

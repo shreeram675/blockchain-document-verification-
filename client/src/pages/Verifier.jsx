@@ -35,8 +35,9 @@ const Verifier = () => {
         } catch (err) {
             const msg = err.response?.data?.message || err.message || 'Verification failed or server error';
             setError(msg);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     return (
