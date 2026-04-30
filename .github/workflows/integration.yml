@@ -5,6 +5,9 @@ on:
   push:
     branches: ["**"]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 permissions:
   contents: read
 
@@ -55,4 +58,3 @@ jobs:
           done
           echo "health check timed out"
           exit 1
-
