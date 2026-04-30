@@ -35,7 +35,8 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          # Repo name ends with '-' which breaks Docker tags; use a clean image name.
+          images: ghcr.io/${{ github.repository_owner }}/blockchain-document-verification
           tags: |
             type=sha
             type=raw,value=latest,enable={{is_default_branch}}
@@ -48,4 +49,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
