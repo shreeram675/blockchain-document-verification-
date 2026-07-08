@@ -8,7 +8,8 @@ async function manualVerification() {
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME
+            database: process.env.DB_NAME,
+            ssl: { minVersion: 'TLSv1.2', rejectUnauthorized: true }
         });
 
         console.log('=== MANUAL VERIFICATION SCRIPT ===\n');

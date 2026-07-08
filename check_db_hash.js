@@ -7,7 +7,8 @@ async function run() {
             host: process.env.DB_HOST || 'localhost',
             user: process.env.DB_USER || 'root',
             password: process.env.DB_PASSWORD || '',
-            database: process.env.DB_NAME || 'doc_verify_db'
+            database: process.env.DB_NAME || 'doc_verify_db',
+            ssl: process.env.DB_HOST ? { minVersion: 'TLSv1.2', rejectUnauthorized: true } : undefined
         });
         const targetHash = '6be1323f1aee859e7356dc8162697db36b0b001aa7d446cb1ea351533f2015ed';
         const [rows] = await db.query('SELECT * FROM verification_proofs WHERE proof_hash = ?', [targetHash]);

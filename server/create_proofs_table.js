@@ -8,7 +8,8 @@ async function createProofsTable() {
             port: process.env.DB_PORT,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME
+            database: process.env.DB_NAME,
+            ssl: { minVersion: 'TLSv1.2', rejectUnauthorized: true }
         });
 
         console.log('✅ Connected to database');
