@@ -11,6 +11,7 @@ import {
     ExternalLink
 } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
+import NetworkBackground from '../components/three/NetworkBackground';
 
 const Verifier = () => {
     const txExplorerBase = import.meta.env.VITE_BLOCK_EXPLORER_TX_BASE || '';
@@ -52,7 +53,8 @@ const Verifier = () => {
     };
 
     return (
-        <div className="min-h-screen p-4 md:p-8 flex items-center justify-center animate-fade-in">
+        <div className="relative min-h-screen p-4 md:p-8 flex items-center justify-center animate-fade-in overflow-hidden">
+            <NetworkBackground className="absolute inset-0 -z-10 opacity-70" />
             <Motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}

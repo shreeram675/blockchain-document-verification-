@@ -35,7 +35,7 @@ export default function ProofVerification() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
+            <div className="min-h-screen flex items-center justify-center">
                 <Motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -49,7 +49,7 @@ export default function ProofVerification() {
     }
 
     return (
-        <div className="min-h-screen p-4 md:p-8 bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="min-h-screen p-4 md:p-8">
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <Motion.div

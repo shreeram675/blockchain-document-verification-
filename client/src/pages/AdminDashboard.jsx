@@ -23,6 +23,7 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip
 } from 'recharts';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
+import TiltCard from '../components/TiltCard';
 
 const AdminDashboard = () => {
     const txExplorerBase = import.meta.env.VITE_BLOCK_EXPLORER_TX_BASE || '';
@@ -325,22 +326,19 @@ const AdminDashboard = () => {
             {/* Quick Metrics - Now Clickable */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {[
-                    { label: 'Total Users', value: stats.users, icon: Users, color: 'blue', view: 'users' },
-                    { label: 'Documents', value: stats.documents, icon: FileText, color: 'emerald', view: 'documents' },
-                    { label: 'Institutions', value: stats.institutions, icon: Building2, color: 'purple', view: 'institutions' },
-                    { label: 'Verifications', value: stats.verifications, icon: ShieldCheck, color: 'orange', view: 'verifications' }
+                    { label: 'Total Users', value: stats.users, icon: Users, view: 'users', border: 'border-blue-500', iconBg: 'bg-blue-50', iconText: 'text-blue-600' },
+                    { label: 'Documents', value: stats.documents, icon: FileText, view: 'documents', border: 'border-emerald-500', iconBg: 'bg-emerald-50', iconText: 'text-emerald-600' },
+                    { label: 'Institutions', value: stats.institutions, icon: Building2, view: 'institutions', border: 'border-purple-500', iconBg: 'bg-purple-50', iconText: 'text-purple-600' },
+                    { label: 'Verifications', value: stats.verifications, icon: ShieldCheck, view: 'verifications', border: 'border-orange-500', iconBg: 'bg-orange-50', iconText: 'text-orange-600' }
                 ].map((item, idx) => (
-                    <Motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.1 }}
+                    <TiltCard
                         key={item.label}
+                        delay={idx * 0.1}
                         onClick={() => setModalView(item.view)}
-                        className="glass p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border-b-4 cursor-pointer hover:scale-105"
-                        style={{ borderColor: `var(--${item.color}-500, ${item.color})` }}
+                        className={`glass p-6 rounded-2xl shadow-lg hover:shadow-xl border-b-4 ${item.border} cursor-pointer`}
                     >
                         <div className="flex justify-between items-center">
-                            <div className={`p-3 rounded-xl bg-${item.color}-50 text-${item.color}-600`}>
+                            <div className={`p-3 rounded-xl ${item.iconBg} ${item.iconText}`}>
                                 <item.icon className="w-6 h-6" />
                             </div>
                             <span className="text-xs font-bold text-slate-500 flex items-center bg-slate-100 px-2 py-1 rounded-full">
@@ -352,7 +350,7 @@ const AdminDashboard = () => {
                             <p className="text-slate-500 text-sm font-medium">{item.label}</p>
                         </div>
                         <p className="text-xs text-indigo-600 mt-2 font-semibold">Click to view details →</p>
-                    </Motion.div>
+                    </TiltCard>
                 ))}
             </div>
 

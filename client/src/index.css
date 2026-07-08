@@ -5,22 +5,167 @@
 :root {
   --primary: #4f46e5;
   --secondary: #7c3aed;
-  --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  --accent: #06b6d4;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c7d2fe transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #a5b4fc, #818cf8);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #818cf8, #6366f1);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--bg-gradient);
   min-height: 100vh;
   color: #1e293b;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
+  position: relative;
+  background: #f4f5fb;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+}
+
+::selection {
+  background: #6366f1;
+  color: white;
+}
+
+/* Ambient animated mesh background used behind every page */
+.mesh-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 45%, #f0fdfa 100%);
+}
+
+.mesh-bg::before,
+.mesh-bg::after {
+  content: '';
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.55;
+  will-change: transform;
+}
+
+.mesh-bg::before {
+  width: 42vw;
+  height: 42vw;
+  top: -12vw;
+  left: -10vw;
+  background: radial-gradient(circle at 30% 30%, #818cf8, transparent 70%);
+  animation: blobFloat 22s ease-in-out infinite;
+}
+
+.mesh-bg::after {
+  width: 38vw;
+  height: 38vw;
+  bottom: -14vw;
+  right: -8vw;
+  background: radial-gradient(circle at 60% 60%, #67e8f9, transparent 70%);
+  animation: blobFloat 26s ease-in-out infinite reverse;
+}
+
+.mesh-bg .mesh-blob-3 {
+  position: absolute;
+  width: 30vw;
+  height: 30vw;
+  top: 35%;
+  left: 55%;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.4;
+  background: radial-gradient(circle at 40% 40%, #c4b5fd, transparent 70%);
+  animation: blobFloat 30s ease-in-out infinite;
+}
+
+@keyframes blobFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(4vw, 3vw) scale(1.08); }
+  66% { transform: translate(-3vw, 5vw) scale(0.95); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mesh-bg::before, .mesh-bg::after, .mesh-bg .mesh-blob-3 {
+    animation: none;
+  }
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, #4f46e5, #7c3aed, #06b6d4);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradientShift 6s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}
+
+/* 3D tilt-card utilities */
+.tilt-wrap {
+  perspective: 1200px;
+}
+
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out, box-shadow 0.3s ease;
+  will-change: transform;
+}
+
+.tilt-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.5), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.tilt-card:hover .tilt-shine {
+  opacity: 1;
 }
 
 .animate-fade-in {
@@ -37,4 +182,13 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.animate-float {
+  animation: floatY 5s ease-in-out infinite;
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
 }

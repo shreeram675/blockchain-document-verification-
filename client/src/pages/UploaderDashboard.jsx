@@ -12,13 +12,16 @@ import {
     ExternalLink,
     Search,
     XCircle,
-    Clock
+    Clock,
+    Loader2,
+    WifiOff
 } from 'lucide-react';
 import {
     PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
     BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from 'recharts';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
+import TiltCard from '../components/TiltCard';
 
 const UploaderDashboard = () => {
     const txExplorerBase = import.meta.env.VITE_BLOCK_EXPLORER_TX_BASE || '';
@@ -33,6 +36,8 @@ const UploaderDashboard = () => {
     });
     const [instStatus, setInstStatus] = useState(null);
     const [instRequest, setInstRequest] = useState(null);
+    const [statusLoading, setStatusLoading] = useState(true);
+    const [statusError, setStatusError] = useState(false);
     const [file, setFile] = useState(null);
     const [hasExpiry, setHasExpiry] = useState(false);
     const [expiryDate, setExpiryDate] = useState('');
@@ -48,6 +53,8 @@ const UploaderDashboard = () => {
     }, []);
 
     const fetchStatus = async () => {
+        setStatusLoading(true);
+        setStatusError(false);
         try {
             const res = await api.get('/institutions/my-status');
             setInstStatus(res.data.status);
@@ -58,6 +65,9 @@ const UploaderDashboard = () => {
             }
         } catch (err) {
             console.error(err);
+            setStatusError(true);
+        } finally {
+            setStatusLoading(false);
         }
     };
 
@@ -253,11 +263,9 @@ const UploaderDashboard = () => {
             {/* Stats Cards - Now Clickable */}
             {instStatus === 'approved' && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
+                    <TiltCard
                         onClick={() => setModalView('documents')}
-                        className="glass p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border-b-4 border-indigo-500 cursor-pointer hover:scale-105"
+                        className="glass p-6 rounded-2xl shadow-lg hover:shadow-xl border-b-4 border-indigo-500 cursor-pointer"
                     >
                         <div className="flex justify-between items-center">
                             <div className="p-3 rounded-xl bg-indigo-50 text-indigo-600">
@@ -270,14 +278,12 @@ const UploaderDashboard = () => {
                             <p className="text-slate-500 text-sm font-medium">Total Documents</p>
                         </div>
                         <p className="text-xs text-indigo-600 mt-2 font-semibold">Click to view all →</p>
-                    </Motion.div>
+                    </TiltCard>
 
-                    <Motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
+                    <TiltCard
+                        delay={0.1}
                         onClick={() => setModalView('verifications')}
-                        className="glass p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border-b-4 border-purple-500 cursor-pointer hover:scale-105"
+                        className="glass p-6 rounded-2xl shadow-lg hover:shadow-xl border-b-4 border-purple-500 cursor-pointer"
                     >
                         <div className="flex justify-between items-center">
                             <div className="p-3 rounded-xl bg-purple-50 text-purple-600">
@@ -290,14 +296,12 @@ const UploaderDashboard = () => {
                             <p className="text-slate-500 text-sm font-medium">Total Verifications</p>
                         </div>
                         <p className="text-xs text-purple-600 mt-2 font-semibold">Click to view all →</p>
-                    </Motion.div>
+                    </TiltCard>
 
-                    <Motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
+                    <TiltCard
+                        delay={0.2}
                         onClick={() => setModalView('valid')}
-                        className="glass p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border-b-4 border-green-500 cursor-pointer hover:scale-105"
+                        className="glass p-6 rounded-2xl shadow-lg hover:shadow-xl border-b-4 border-green-500 cursor-pointer"
                     >
                         <div className="flex justify-between items-center">
                             <div className="p-3 rounded-xl bg-green-50 text-green-600">
@@ -312,7 +316,7 @@ const UploaderDashboard = () => {
                             <p className="text-slate-500 text-sm font-medium">Verification Success</p>
                         </div>
                         <p className="text-xs text-green-600 mt-2 font-semibold">Click to view valid →</p>
-                    </Motion.div>
+                    </TiltCard>
                 </div>
             )}
 
@@ -378,7 +382,28 @@ const UploaderDashboard = () => {
             </AnimatePresence>
 
             {/* Rest of the dashboard content... */}
-            {instStatus === 'none' && (
+            {statusLoading && (
+                <div className="glass p-12 rounded-3xl shadow-xl text-center">
+                    <Loader2 className="w-10 h-10 text-indigo-500 mx-auto mb-4 animate-spin" />
+                    <p className="text-slate-500 font-medium">Loading institution status...</p>
+                </div>
+            )}
+
+            {!statusLoading && statusError && (
+                <div className="glass p-12 rounded-3xl shadow-xl text-center">
+                    <WifiOff className="w-14 h-14 text-red-400 mx-auto mb-4" />
+                    <h2 className="text-xl font-bold text-slate-800 mb-2">Couldn't reach the server</h2>
+                    <p className="text-slate-500 mb-6">Check your connection and try again.</p>
+                    <button
+                        onClick={fetchStatus}
+                        className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all"
+                    >
+                        Retry
+                    </button>
+                </div>
+            )}
+
+            {!statusLoading && !statusError && instStatus === 'none' && (
                 <div className="glass p-8 rounded-3xl shadow-xl">
                     <h2 className="text-2xl font-bold mb-4">Request Institution Access</h2>
                     <form onSubmit={handleRequestSubmit} className="space-y-4">
